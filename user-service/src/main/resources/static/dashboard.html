@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil - Fantasy Football</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>👤 Mon Profil</h1>
+        <p>Tableau de bord personnel</p>
+        <button onclick="logout()" class="btn btn-danger" style="position: absolute; top: 20px; right: 20px;">
+            🚪 Déconnexion
+        </button>
+    </div>
+
+    <!-- CARTE PROFIL -->
+    <div class="profile-card">
+        <h2>📋 Informations Personnelles</h2>
+        <div id="profileData">
+            <p>Chargement...</p>
+        </div>
+    </div>
+
+    <!-- STATISTIQUES -->
+    <div class="cards">
+        <div class="card">
+            <h3>🏆 Mon Score Total</h3>
+            <div id="userScore">
+                <p class="score-value">0</p>
+                <p style="color: #666;">points</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📊 Mon Classement</h3>
+            <div id="userRank">
+                <p class="rank-value">-</p>
+                <p style="color: #666;">position</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📈 Percentile</h3>
+            <div id="userPercentile">
+                <p class="rank-value">-</p>
+                <p style="color:  #666;">Top %</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- DÉTAILS DES POINTS -->
+    <div class="stats">
+        <h3>🎮 Détails des Points</h3>
+        <div id="pointsDetails">
+            <p>⚽ <strong>Points Fantasy: </strong> <span id="fantasyPoints">0</span></p>
+            <p>💬 <strong>Points Sociaux:</strong> <span id="socialPoints">0</span></p>
+            <p>🏅 <strong>Total: </strong> <span id="totalPoints">0</span></p>
+        </div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="actions">
+        <a href="http://localhost:8084" class="btn btn-success">
+            🏆 Voir le Leaderboard Complet
+        </a>
+        <a href="index.html" class="btn btn-secondary">
+            🏠 Retour à l'accueil
+        </a>
+    </div>
+</div>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>

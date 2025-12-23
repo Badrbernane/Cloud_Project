@@ -1,20 +1,21 @@
 package com.leaderboardservice.service;
 
-import com.leaderboardservice.dto.*;
+import com.leaderboardservice. dto.*;
 import com.leaderboardservice.model.*;
 import com.leaderboardservice.repository.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j. Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework. data.domain.Pageable;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework. beans.factory.annotation.Value;
+import org.springframework.data. domain.Page;
+import org. springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream. Collectors;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +27,12 @@ public class LeaderboardService {
     private final TrendingPostRepository trendingPostRepository;
     private final LeaderboardEventRepository eventRepository;
     private final RankingCalculator rankingCalculator;
-    private final RedisService redisService;
+    // private final RedisService redisService;  // ← COMMENTÉ
 
-    @Value("${cache.leaderboard-ttl}")
+    @Value("${cache.leaderboard-ttl:3600}")
     private long leaderboardTtl;
 
-    @Value("${cache.user-stats-ttl}")
+    @Value("${cache.user-stats-ttl:1800}")
     private long userStatsTtl;
 
     // ==================== USER LEADERBOARD ====================
@@ -39,13 +40,13 @@ public class LeaderboardService {
     public List<LeaderboardEntry> getGlobalLeaderboard(int limit) {
         String cacheKey = "leaderboard:global:" + limit;
 
-        // Try cache first
-        List<LeaderboardEntry> cached = (List<LeaderboardEntry>) redisService.get(cacheKey, List.class);
-        if (cached != null) {
-            return cached;
-        }
+        // Try cache first - DISABLED
+        // List<LeaderboardEntry> cached = (List<LeaderboardEntry>) redisService.get(cacheKey, List.class);
+        // if (cached != null) {
+        //     return cached;
+        // }
 
-        log.info("Fetching global leaderboard from DB (limit: {})", limit);
+        log.info("Fetching global leaderboard from DB (limit:  {})", limit);
 
         Pageable pageable = PageRequest. of(0, limit);
         Page<UserScore> page = userScoreRepository.findAllByOrderByTotalScoreDesc(pageable);
@@ -54,23 +55,46 @@ public class LeaderboardService {
                 .map(this::mapToLeaderboardEntry)
                 .collect(Collectors.toList());
 
-        // Cache result
-        redisService.set(cacheKey, leaderboard, leaderboardTtl);
+        // Cache result - DISABLED
+        // redisService.set(cacheKey, leaderboard, leaderboardTtl);
 
         return leaderboard;
+    }
+
+    @Transactional
+    public void initializeUser(UUID userId, String username, Integer score) {
+        // Vérifier si l'utilisateur existe déjà
+        if (userScoreRepository.existsByUserId(userId)) {
+            log.warn("⚠️ User {} already exists in leaderboard", userId);
+            return;
+        }
+
+        // Créer l'entrée UserScore avec tous les scores à 0
+        UserScore userScore = UserScore. builder()
+                .userId(userId)
+                .username(username)
+                .fantasyPoints(0)
+                .socialPoints(0)
+                .totalScore(0)
+                .rank(0)
+                .build();
+
+        userScoreRepository. save(userScore);
+        log.info("✅ User {} initialized in leaderboard with totalScore 0", username);
     }
 
     public UserStatsResponse getUserStats(UUID userId) {
         String cacheKey = "leaderboard:user:" + userId;
 
-        UserStatsResponse cached = redisService.get(cacheKey, UserStatsResponse.class);
-        if (cached != null) {
-            return cached;
-        }
+        // Cache check - DISABLED
+        // UserStatsResponse cached = redisService. get(cacheKey, UserStatsResponse.class);
+        // if (cached != null) {
+        //     return cached;
+        // }
 
         log.info("Fetching user stats from DB:  {}", userId);
 
-        UserScore userScore = userScoreRepository.findByUserId(userId)
+        UserScore userScore = userScoreRepository. findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("User not found in leaderboard"));
 
         long totalUsers = userScoreRepository. count();
@@ -80,7 +104,7 @@ public class LeaderboardService {
         UserStatsResponse stats = UserStatsResponse.builder()
                 .userId(userId)
                 .username(userScore.getUsername())
-                .currentRank(userScore. getRank())
+                .currentRank(userScore.getRank())
                 .fantasyPoints(userScore.getFantasyPoints())
                 .socialPoints(userScore.getSocialPoints())
                 .totalScore(userScore.getTotalScore())
@@ -88,7 +112,8 @@ public class LeaderboardService {
                 .percentile(percentile)
                 .build();
 
-        redisService. set(cacheKey, stats, userStatsTtl);
+        // Cache set - DISABLED
+        // redisService.set(cacheKey, stats, userStatsTtl);
 
         return stats;
     }
@@ -96,12 +121,13 @@ public class LeaderboardService {
     // ==================== TEAM LEADERBOARD ====================
 
     public List<TeamLeaderboardEntry> getTeamLeaderboard(int limit) {
-        String cacheKey = "leaderboard:teams:" + limit;
+        String cacheKey = "leaderboard: teams:" + limit;
 
-        List<TeamLeaderboardEntry> cached = (List<TeamLeaderboardEntry>) redisService.get(cacheKey, List.class);
-        if (cached != null) {
-            return cached;
-        }
+        // Cache check - DISABLED
+        // List<TeamLeaderboardEntry> cached = (List<TeamLeaderboardEntry>) redisService.get(cacheKey, List.class);
+        // if (cached != null) {
+        //     return cached;
+        // }
 
         log.info("Fetching team leaderboard from DB (limit: {})", limit);
 
@@ -112,7 +138,8 @@ public class LeaderboardService {
                 .map(this::mapToTeamEntry)
                 .collect(Collectors.toList());
 
-        redisService.set(cacheKey, leaderboard, leaderboardTtl);
+        // Cache set - DISABLED
+        // redisService.set(cacheKey, leaderboard, leaderboardTtl);
 
         return leaderboard;
     }
@@ -122,10 +149,11 @@ public class LeaderboardService {
     public List<TrendingPostEntry> getTrendingPosts(int limit) {
         String cacheKey = "leaderboard:trending:" + limit;
 
-        List<TrendingPostEntry> cached = (List<TrendingPostEntry>) redisService.get(cacheKey, List.class);
-        if (cached != null) {
-            return cached;
-        }
+        // Cache check - DISABLED
+        // List<TrendingPostEntry> cached = (List<TrendingPostEntry>) redisService.get(cacheKey, List.class);
+        // if (cached != null) {
+        //     return cached;
+        // }
 
         log.info("Fetching trending posts from DB (limit: {})", limit);
 
@@ -134,11 +162,12 @@ public class LeaderboardService {
                 .limit(limit)
                 .toList();
 
-        List<TrendingPostEntry> trending = posts.stream()
+        List<TrendingPostEntry> trending = posts. stream()
                 .map(this:: mapToTrendingEntry)
                 .collect(Collectors.toList());
 
-        redisService. set(cacheKey, trending, leaderboardTtl);
+        // Cache set - DISABLED
+        // redisService.set(cacheKey, trending, leaderboardTtl);
 
         return trending;
     }
@@ -151,13 +180,13 @@ public class LeaderboardService {
 
         UserScore userScore = userScoreRepository.findByUserId(userId)
                 .orElse(UserScore.builder()
-                        . userId(userId)
-                        . username("User-" + userId. toString().substring(0, 8))
+                        .userId(userId)
+                        .username("User-" + userId.toString().substring(0, 8))
                         .build());
 
         userScore.setFantasyPoints(fantasyPoints);
         userScore.setTotalScore(rankingCalculator.calculateTotalScore(
-                userScore.getFantasyPoints(),
+                userScore. getFantasyPoints(),
                 userScore.getSocialPoints()));
 
         userScoreRepository.save(userScore);
@@ -165,22 +194,22 @@ public class LeaderboardService {
         // Update team ranking
         if (teamId != null) {
             TeamRanking teamRanking = teamRankingRepository. findByTeamId(teamId)
-                    . orElse(TeamRanking.builder()
+                    .orElse(TeamRanking.builder()
                             .teamId(teamId)
                             .userId(userId)
-                            .teamName("Team-" + teamId.toString().substring(0, 8))
+                            .teamName("Team-" + teamId. toString().substring(0, 8))
                             .build());
 
-            teamRanking. setTotalPoints(fantasyPoints);
+            teamRanking.setTotalPoints(fantasyPoints);
             teamRankingRepository.save(teamRanking);
         }
 
         // Log event
         logEvent(userId, "FANTASY_POINTS_UPDATE", fantasyPoints, "fantasy-service");
 
-        // Invalidate caches
-        invalidateUserCache(userId);
-        invalidateLeaderboardCache();
+        // Invalidate caches - DISABLED
+        // invalidateUserCache(userId);
+        // invalidateLeaderboardCache();
     }
 
     @Transactional
@@ -189,12 +218,12 @@ public class LeaderboardService {
 
         UserScore userScore = userScoreRepository.findByUserId(userId)
                 .orElse(UserScore.builder()
-                        . userId(userId)
-                        . username("User-" + userId. toString().substring(0, 8))
+                        .userId(userId)
+                        .username("User-" + userId.toString().substring(0, 8))
                         .build());
 
-        userScore.setSocialPoints(userScore.getSocialPoints() + pointsChange);
-        userScore. setTotalScore(rankingCalculator.calculateTotalScore(
+        userScore.setSocialPoints(userScore. getSocialPoints() + pointsChange);
+        userScore.setTotalScore(rankingCalculator. calculateTotalScore(
                 userScore.getFantasyPoints(),
                 userScore.getSocialPoints()));
 
@@ -203,9 +232,9 @@ public class LeaderboardService {
         // Log event
         logEvent(userId, eventType, pointsChange, "social-service");
 
-        // Invalidate caches
-        invalidateUserCache(userId);
-        invalidateLeaderboardCache();
+        // Invalidate caches - DISABLED
+        // invalidateUserCache(userId);
+        // invalidateLeaderboardCache();
     }
 
     @Transactional
@@ -216,19 +245,19 @@ public class LeaderboardService {
 
         TrendingPost trendingPost = trendingPostRepository.findByPostId(postId)
                 .orElse(TrendingPost.builder()
-                        . postId(postId)
+                        .postId(postId)
                         .userId(userId)
                         .content(content)
                         .build());
 
-        trendingPost. setLikesCount(likes);
-        trendingPost. setCommentsCount(comments);
+        trendingPost.setLikesCount(likes);
+        trendingPost.setCommentsCount(comments);
         trendingPost.setEngagementScore(engagementScore);
 
         trendingPostRepository.save(trendingPost);
 
-        // Invalidate cache
-        redisService.deletePattern("leaderboard:trending: *");
+        // Invalidate cache - DISABLED
+        // redisService.deletePattern("leaderboard:trending: *");
     }
 
     // ==================== RECALCULATE ====================
@@ -241,43 +270,45 @@ public class LeaderboardService {
         rankingCalculator.recalculateTeamRankings();
         rankingCalculator.recalculateTrendingPosts();
 
-        // Clear all caches
-        redisService. deletePattern("leaderboard:*");
+        // Clear all caches - DISABLED
+        // redisService.deletePattern("leaderboard:*");
 
-        log.info("All rankings recalculated and caches cleared");
+        log.info("All rankings recalculated");
     }
 
     // ==================== GLOBAL STATS ====================
 
     public GlobalStatsResponse getGlobalStats() {
-        String cacheKey = "leaderboard:stats: global";
+        String cacheKey = "leaderboard: stats: global";
 
-        GlobalStatsResponse cached = redisService. get(cacheKey, GlobalStatsResponse.class);
-        if (cached != null) {
-            return cached;
-        }
+        // Cache check - DISABLED
+        // GlobalStatsResponse cached = redisService.get(cacheKey, GlobalStatsResponse.class);
+        // if (cached != null) {
+        //     return cached;
+        // }
 
         log.info("Calculating global stats...");
 
         long totalUsers = userScoreRepository. count();
         long totalTeams = teamRankingRepository.count();
-        long totalPosts = trendingPostRepository. count();
+        long totalPosts = trendingPostRepository.count();
 
         List<UserScore> topUsers = userScoreRepository.findTop100ByOrderByTotalScoreDesc();
         int averageScore = topUsers.isEmpty() ? 0 :
                 (int) topUsers.stream().mapToInt(UserScore::getTotalScore).average().orElse(0);
         int highestScore = topUsers.isEmpty() ? 0 :
-                topUsers.get(0).getTotalScore();
+                topUsers. get(0).getTotalScore();
 
         GlobalStatsResponse stats = GlobalStatsResponse.builder()
                 .totalUsers(totalUsers)
                 .totalTeams(totalTeams)
                 .totalPosts(totalPosts)
-                .averageScore(averageScore)
+                .averageScore((double)averageScore)
                 .highestScore(highestScore)
                 .build();
 
-        redisService.set(cacheKey, stats, leaderboardTtl);
+        // Cache set - DISABLED
+        // redisService.set(cacheKey, stats, leaderboardTtl);
 
         return stats;
     }
@@ -294,23 +325,24 @@ public class LeaderboardService {
         eventRepository.save(event);
     }
 
-    private void invalidateUserCache(UUID userId) {
-        redisService.delete("leaderboard:user:" + userId);
-    }
+    // Cache invalidation methods - DISABLED
+    // private void invalidateUserCache(UUID userId) {
+    //     redisService.delete("leaderboard:user:" + userId);
+    // }
 
-    private void invalidateLeaderboardCache() {
-        redisService.deletePattern("leaderboard:global:*");
-        redisService.deletePattern("leaderboard:teams:*");
-    }
+    // private void invalidateLeaderboardCache() {
+    //     redisService.deletePattern("leaderboard:global:*");
+    //     redisService.deletePattern("leaderboard:teams: *");
+    // }
 
     private LeaderboardEntry mapToLeaderboardEntry(UserScore userScore) {
         return LeaderboardEntry. builder()
                 .rank(userScore.getRank())
                 .userId(userScore.getUserId())
-                .username(userScore.getUsername())
+                .username(userScore. getUsername())
                 .fantasyPoints(userScore.getFantasyPoints())
                 .socialPoints(userScore.getSocialPoints())
-                .totalScore(userScore.getTotalScore())
+                .totalScore(userScore. getTotalScore())
                 .lastUpdated(userScore.getLastUpdated())
                 .build();
     }
@@ -322,14 +354,14 @@ public class LeaderboardService {
                 .userId(team.getUserId())
                 .teamName(team.getTeamName())
                 .totalPoints(team.getTotalPoints())
-                .lastUpdated(team. getLastUpdated())
+                .lastUpdated(team.getLastUpdated())
                 .build();
     }
 
     private TrendingPostEntry mapToTrendingEntry(TrendingPost post) {
         return TrendingPostEntry.builder()
                 .rank(post.getRank())
-                .postId(post. getPostId())
+                .postId(post.getPostId())
                 .userId(post.getUserId())
                 .content(post.getContent())
                 .likesCount(post.getLikesCount())

@@ -6,10 +6,10 @@ spring:
     name: leaderboard-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5435/zlayji_leaderboard
-    username: postgres
-    password: postgres123
-    driver-class-name:  org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/leaderboard_db
+    username:  leaderboardadmin
+    password: LeaderB0ard2025!
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -20,38 +20,44 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
-  # Redis Configuration
   data:
     redis:
       host: localhost
       port: 6379
-      password:   # Laisser vide pour local
       timeout: 60000
 
-# URLs des autres services
-services:
-  user-service:
-    url: http://localhost:8081
-  social-service:
-    url: http://localhost:8082
-  fantasy-service:
-    url: http://localhost:8083
+# Management & Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  health:
+    defaults:
+      enabled: true
 
-# Configuration des scores
+# Configuration scoring
 scoring:
-  fantasy-multiplier: 2      # Fantasy points valent 2x
-  social-multiplier: 1       # Social points valent 1x
+  fantasy-multiplier: 2
+  social-multiplier: 1
   post-created-points: 10
-  like-received-points: 2
+  like-received-points:  2
   comment-received-points: 5
 
-# Cache TTL (en secondes)
+# Cache TTL
 cache:
-  leaderboard-ttl: 300       # 5 minutes
-  user-stats-ttl: 60         # 1 minute
+  leaderboard-ttl: 300
+  user-stats-ttl:  60
+# Désactiver Redis temporairement
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 
 logging:
   level:
-    com.leaderboardservice: DEBUG
-    org.springframework.web: INFO
-    org.hibernate. SQL: DEBUG
+    com. leaderboardservice: INFO
+    org.springframework: WARN

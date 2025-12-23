@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques Joueur</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📊 Statistiques Détaillées</h1>
+        <a href="index.html" class="back-link">← Retour au Classement</a>
+    </div>
+
+    <div class="profile-card">
+        <h2 id="playerName">Chargement...</h2>
+        <div id="playerStats">
+            <p>Chargement des statistiques...</p>
+        </div>
+    </div>
+
+    <div class="cards">
+        <div class="card">
+            <h3>🏅 Classement</h3>
+            <p class="rank-value" id="userRank">-</p>
+        </div>
+        <div class="card">
+            <h3>🏆 Score Total</h3>
+            <p class="score-value" id="totalScore">-</p>
+        </div>
+        <div class="card">
+            <h3>📈 Percentile</h3>
+            <p class="rank-value" id="percentile">-</p>
+        </div>
+    </div>
+
+    <div class="stats">
+        <h3>📊 Détails</h3>
+        <div id="detailedStats"></div>
+    </div>
+</div>
+
+<script src="js/user-stats.js"></script>
+</body>
+</html>

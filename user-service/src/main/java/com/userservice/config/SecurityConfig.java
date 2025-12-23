@@ -1,9 +1,10 @@
 package com.userservice.config;
 
-import org.springframework.context. annotation.Bean;
-import org. springframework.context.annotation.Configuration;
-import org.springframework.security. config.annotation.web.builders. HttpSecurity;
-import org.springframework.security.config.annotation. web.configuration.EnableWebSecurity;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org. springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,8 +22,29 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/**", "/health").permitAll()
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authorizeHttpRequests(authz -> authz
+                        // ✅ Autoriser les fichiers statiques (HTML, CSS, JS)
+                        .requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/register.html",
+                                "/login.html",
+                                "/dashboard.html",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                "/api/users/register",
+                                "/api/users/login",
+                                "/api/users/health",
+                                "/api/users",
+                                "/health",
+                                "/actuator/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 );
 

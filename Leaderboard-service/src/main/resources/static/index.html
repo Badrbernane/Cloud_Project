@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏆 Leaderboard - Fantasy Football</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+    <!-- HEADER -->
+    <div class="header">
+        <h1>🏆 Classement Global</h1>
+        <p>Les meilleurs joueurs de Fantasy Football</p>
+        <a href="http://localhost:8081" class="btn btn-secondary"
+           style="position: absolute; top: 20px; right: 20px;">
+            👤 Mon Profil
+        </a>
+    </div>
+
+    <!-- STATISTIQUES GLOBALES -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>👥 Joueurs Actifs</h3>
+            <p class="stat-value" id="totalUsers">-</p>
+        </div>
+        <div class="stat-card">
+            <h3>⚽ Équipes</h3>
+            <p class="stat-value" id="totalTeams">-</p>
+        </div>
+        <div class="stat-card">
+            <h3>🏅 Score Moyen</h3>
+            <p class="stat-value" id="avgScore">-</p>
+        </div>
+        <div class="stat-card">
+            <h3>🔥 Meilleur Score</h3>
+            <p class="stat-value" id="topScore">-</p>
+        </div>
+    </div>
+
+    <!-- NAVIGATION ONGLETS -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('users')">
+            👤 Classement Joueurs
+        </button>
+        <button class="tab-btn" onclick="showTab('teams')">
+            ⚽ Classement Équipes
+        </button>
+        <button class="tab-btn" onclick="showTab('trending')">
+            🔥 Posts Tendances
+        </button>
+    </div>
+
+    <!-- ONGLET JOUEURS -->
+    <div id="users-tab" class="tab-content active">
+        <div class="leaderboard-header">
+            <h2>🏆 Top 100 Joueurs</h2>
+            <div class="filters">
+                <label>
+                    Afficher:
+                    <select id="userLimit" onchange="loadUsers()">
+                        <option value="10">Top 10</option>
+                        <option value="25">Top 25</option>
+                        <option value="50" selected>Top 50</option>
+                        <option value="100">Top 100</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="leaderboard-table">
+                <thead>
+                <tr>
+                    <th>🏅 Rang</th>
+                    <th>👤 Joueur</th>
+                    <th>⚽ Points Fantasy</th>
+                    <th>💬 Points Sociaux</th>
+                    <th>🏆 Score Total</th>
+                    <th>📅 Dernière MAJ</th>
+                </tr>
+                </thead>
+                <tbody id="usersTable">
+                <tr>
+                    <td colspan="6" class="loading">Chargement...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ONGLET ÉQUIPES -->
+    <div id="teams-tab" class="tab-content">
+        <div class="leaderboard-header">
+            <h2>⚽ Top Équipes</h2>
+        </div>
+        <div class="table-container">
+            <table class="leaderboard-table">
+                <thead>
+                <tr>
+                    <th>🏅 Rang</th>
+                    <th>⚽ Équipe</th>
+                    <th>👤 Propriétaire</th>
+                    <th>🏆 Points Totaux</th>
+                    <th>📅 Dernière MAJ</th>
+                </tr>
+                </thead>
+                <tbody id="teamsTable">
+                <tr>
+                    <td colspan="5" class="loading">Chargement...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ONGLET TRENDING -->
+    <div id="trending-tab" class="tab-content">
+        <div class="leaderboard-header">
+            <h2>🔥 Posts les Plus Populaires</h2>
+        </div>
+        <div class="trending-grid" id="trendingGrid">
+            <p class="loading">Chargement...</p>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <p>🔄 Mise à jour automatique toutes les 30 secondes</p>
+        <p>
+            <a href="http://localhost:8081">User Service</a> |
+            <a href="http://localhost:8084">Leaderboard API</a>
+        </p>
+    </div>
+</div>
+
+<script src="js/leaderboard.js"></script>
+</body>
+</html>

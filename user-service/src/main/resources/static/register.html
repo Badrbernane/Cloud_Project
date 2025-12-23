@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📝 Créer un Compte</h1>
+        <a href="index.html" class="back-link">← Retour</a>
+    </div>
+
+    <div class="form-container">
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="username">👤 Nom d'utilisateur</label>
+                <input type="text" id="username" name="username" required
+                       placeholder="Ex: JohnDoe" minlength="3">
+            </div>
+
+            <div class="form-group">
+                <label for="email">📧 Email</label>
+                <input type="email" id="email" name="email" required
+                       placeholder="Ex: john@esi.dz">
+            </div>
+
+            <div class="form-group">
+                <label for="password">🔒 Mot de passe</label>
+                <input type="password" id="password" name="password" required
+                       placeholder="Min 8 caractères" minlength="8">
+            </div>
+
+            <div class="form-group">
+                <label for="countryCode">🌍 Pays</label>
+                <select id="countryCode" name="countryCode" required>
+                    <option value="DZ">🇩🇿 Algérie</option>
+                    <option value="FR">🇫🇷 France</option>
+                    <option value="MA">🇲🇦 Maroc</option>
+                    <option value="TN">🇹🇳 Tunisie</option>
+                    <option value="US">🇺🇸 USA</option>
+                    <option value="GB">🇬🇧 Royaume-Uni</option>
+                    <option value="ES">🇪🇸 Espagne</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Créer mon compte
+            </button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <p class="text-center">
+            Déjà un compte ?
+            <a href="login.html">Se connecter</a>
+        </p>
+    </div>
+</div>
+
+<script src="js/register.js"></script>
+</body>
+</html>

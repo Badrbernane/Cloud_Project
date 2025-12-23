@@ -1,5 +1,6 @@
 package com.userservice.service;
 
+import com.userservice.client.LeaderboardServiceClient;
 import com.userservice.dto.LoginRequest;
 import com.userservice.dto. RegisterRequest;
 import com.userservice.dto.UserResponse;
@@ -10,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j. Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -21,41 +24,46 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final LeaderboardServiceClient leaderboardServiceClient;
 
+    @Transactional
     public UserResponse register(RegisterRequest request) {
-        log.info("Registering user with email: {}", request.getEmail());
-
+        // Vérifications
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
-
-        if (userRepository. existsByUsername(request.getUsername())) {
+        if (userRepository.existsByUsername(request.getUsername())) {
             throw new RuntimeException("Username already exists");
         }
 
-        User user = User. builder()
+        // Créer l'utilisateur
+        User user = User.builder()
+                .id(UUID.randomUUID())
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .countryCode(request.getCountryCode())
                 .isActive(true)
+                .createdAt(LocalDateTime.now())
                 .build();
 
-        User savedUser = userRepository. save(user);
-        log.info("User registered successfully with id: {}", savedUser.getId());
+        user = userRepository.save(user);
+        log.info("✅ User registered:  {} (ID: {})", user.getEmail(), user.getId());
 
-        String token = jwtUtil.generateToken(savedUser.getId(), savedUser.getEmail());
+        // Générer le token
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
 
-        return UserResponse.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .avatarUrl(savedUser.getAvatarUrl())
-                .countryCode(savedUser.getCountryCode())
-                .createdAt(savedUser.getCreatedAt())
-                .token(token)
-                .build();
+        // 🔥 APPELER LEADERBOARD SERVICE
+        if (leaderboardServiceClient.isAvailable()) {
+            log.info("🔵 Leaderboard Service is available, initializing user.. .");
+            leaderboardServiceClient.initializeUser(user.getId(), user.getUsername());
+        } else {
+            log.warn("⚠️ Leaderboard Service unavailable, skipping initialization");
+        }
+
+        return UserResponse.fromUser(user,token);
     }
+
 
     public UserResponse login(LoginRequest request) {
         log.info("Login attempt for email: {}", request.getEmail());
