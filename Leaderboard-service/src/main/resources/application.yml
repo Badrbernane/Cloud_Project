@@ -6,9 +6,9 @@ spring:
     name: leaderboard-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/leaderboard_db
-    username:  leaderboardadmin
-    password: LeaderB0ard2025!
+    url: jdbc:postgresql://zlayjican-postgres.cfc0say8wzxh.eu-north-1.rds.amazonaws.com:5432/zlayjican_db?sslmode=require
+    username: leaderbord
+    password: zlayjican2026
     driver-class-name: org.postgresql.Driver
 
   jpa:
