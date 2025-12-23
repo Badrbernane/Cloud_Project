@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*")
 public class UserController {
 
     private final UserService userService;

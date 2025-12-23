@@ -6,9 +6,9 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=users_db;encrypt=true;trustServerCertificate=true
-    username: userservice_admin
-    password: UserService2025!
+    url: jdbc:sqlserver://zlayji-sql-server.database.windows.net:1433;database=zlayji-sql-server;encrypt=true;trustServerCertificate=true;loginTimeout=30;
+    username: zlayjisql-server@zlayji-sql-server
+    password: Cloudprojet123
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
