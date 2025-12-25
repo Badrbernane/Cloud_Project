@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://marketplacedb.ctgsyo0owoip.eu-north-1.rds.amazonaws.com:5432/marketplacedb
+    username: postgres
+    password: Mouslim1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+# Activate with -Dspring.profiles.active=rds
