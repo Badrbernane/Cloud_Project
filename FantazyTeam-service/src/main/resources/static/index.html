@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FantazyTeam - Dashboard</title>
+    <link rel="stylesheet" href="css/fantasy.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>⚽ FantazyTeam Dashboard</h1>
+        <nav>
+            <span id="userInfo">👤 <span id="username">Utilisateur</span></span>
+            <a href="index.html">Accueil</a>
+            <a href="players.html">Joueurs</a>
+            <a href="my-team.html">Mon Équipe</a>
+            <a href="http://localhost:8084/index.html">🏆 Classement</a>
+            <a href="#" id="logoutBtn" style="color: #ff6b6b;">🚪 Déconnexion</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="dashboard">
+            <h2>Bienvenue sur FantazyTeam !  </h2>
+
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Joueurs disponibles</span>
+                        <span class="stat-value" id="totalPlayers">-</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Mon équipe</span>
+                        <span class="stat-value" id="myTeamCount">-</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Budget restant</span>
+                        <span class="stat-value" id="budget">-</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-info">
+                        <span class="stat-label">Points totaux</span>
+                        <span class="stat-value" id="totalPoints">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions">
+                <a href="players.html" class="btn btn-primary">
+                    <span>🔍</span> Voir les joueurs
+                </a>
+                <a href="my-team.html" class="btn btn-secondary">
+                    <span>⚽</span> Gérer mon équipe
+                </a>
+            </div>
+
+            <div class="info-box">
+                <h3>📋 Comment jouer ?</h3>
+                <ol>
+                    <li>Créez votre équipe avec un budget de <strong>100M</strong></li>
+                    <li>Recrutez jusqu'à <strong>15 joueurs</strong></li>
+                    <li>Gagnez des points selon les performances de vos joueurs</li>
+                    <li>Gérez vos transferts pour optimiser votre équipe</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 FantazyTeam Service</p>
+    </footer>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script>
+    // Charger les stats au chargement
+    window.addEventListener('DOMContentLoaded', async () => {
+        const userId = getUserId();
+        if (!userId) {
+            document.getElementById('username').textContent = 'Invité';
+            return;
+        }
+
+        // Username depuis localStorage
+        const username = localStorage.getItem('username') || 'Utilisateur';
+        document.getElementById('username').textContent = username;
+
+        try {
+            // Total joueurs
+            const players = await fetchAPI('/api/fantasy/players');
+            document.getElementById('totalPlayers').textContent = players.length;
+
+            // Mon équipe
+            const teams = await fetchAPI(`/api/fantasy/teams/user/${userId}`);
+            if (teams && teams.length > 0) {
+                const team = teams[0];
+                document.getElementById('myTeamCount').textContent = team.playerCount + '/15';
+                document.getElementById('budget').textContent = team. remainingBudget + 'M';
+                document. getElementById('totalPoints').textContent = team.totalPoints;
+            } else {
+                document.getElementById('myTeamCount').textContent = '0/15';
+                document.getElementById('budget').textContent = '100M';
+                document.getElementById('totalPoints').textContent = '0';
+            }
+        } catch (error) {
+            console.error('Erreur chargement stats:', error);
+        }
+    });
+</script>
+</body>
+</html>

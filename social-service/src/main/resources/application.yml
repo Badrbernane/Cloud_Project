@@ -1,14 +1,14 @@
 server:
-  port: 8082
+  port: 8083
 
 spring:
   application:
     name: social-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/zlayji_social
-    username: postgres
-    password: postgres123
+    url: jdbc:postgresql://zlayji-social-db.cxgaw6uoyb83.us-east-2.rds.amazonaws.com:5432/postgres?sslmode=require
+    username: social_admin
+    password: Cloudprojet123
     driver-class-name: org.postgresql.Driver
 
   jpa:

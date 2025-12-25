@@ -6,9 +6,9 @@ spring:
     name: fantazyteam-service
 
   datasource:
-    url:  jdbc:mysql://localhost:3306/zlayji_fantasy? useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: fantasy_admin
-    password: Fantasy2025!
+    url: jdbc:mysql://34.163.46.18:3306/zlayjican_db?useSSL=true&requireSSL=true&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: zlayjican-user
+    password: "@Zlayjican2026"
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Équipe - FantazyTeam</title>
+    <link rel="stylesheet" href="css/fantasy.css">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>⚽ FantazyTeam</h1>
+        <nav>
+            <span id="userInfo">👤 <span id="username">Utilisateur</span></span>
+            <a href="index.html">Accueil</a>
+            <a href="players.html">Joueurs</a>
+            <a href="my-team.html">Mon Équipe</a>
+            <a href="http://localhost:8084/index.html">🏆 Classement</a>
+            <a href="#" id="logoutBtn" style="color: #ff6b6b;">🚪 Déconnexion</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Formulaire création équipe -->
+        <div id="noTeam" class="no-team" style="display: none;">
+            <h2>🎯 Créez votre équipe !</h2>
+            <p>Vous n'avez pas encore d'équipe.  Créez-en une pour commencer !</p>
+            <form id="createTeamForm">
+                <div class="form-group">
+                    <label for="teamName">Nom de votre équipe</label>
+                    <input type="text" id="teamName" required minlength="3"
+                           placeholder="Ex: Les Champions, Dream Team... ">
+                </div>
+                <button type="submit" class="btn btn-primary">Créer mon équipe</button>
+            </form>
+        </div>
+
+        <!-- Affichage équipe -->
+        <div id="teamContainer" style="display: none;">
+            <div class="team-header">
+                <h2><span id="teamNameDisplay"></span></h2>
+                <div class="team-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">💰 Budget restant</span>
+                        <span class="stat-value" id="remainingBudget">0M</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">🏆 Points totaux</span>
+                        <span class="stat-value" id="totalPoints">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">👥 Joueurs</span>
+                        <span class="stat-value" id="playerCount">0/15</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-squad">
+                <div class="position-group">
+                    <h3>🧤 Gardiens</h3>
+                    <div id="goalkeepers" class="player-list">
+                        <p class="empty-position">Aucun gardien</p>
+                    </div>
+                </div>
+
+                <div class="position-group">
+                    <h3>🛡️ Défenseurs</h3>
+                    <div id="defenders" class="player-list">
+                        <p class="empty-position">Aucun défenseur</p>
+                    </div>
+                </div>
+
+                <div class="position-group">
+                    <h3>⚙️ Milieux</h3>
+                    <div id="midfielders" class="player-list">
+                        <p class="empty-position">Aucun milieu</p>
+                    </div>
+                </div>
+
+                <div class="position-group">
+                    <h3>⚡ Attaquants</h3>
+                    <div id="forwards" class="player-list">
+                        <p class="empty-position">Aucun attaquant</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="team-actions">
+                <a href="players.html" class="btn btn-primary">+ Ajouter des joueurs</a>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">Chargement... </div>
+        <div id="message" class="message"></div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 FantazyTeam Service</p>
+    </footer>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/team.js"></script>
+</body>
+</html>

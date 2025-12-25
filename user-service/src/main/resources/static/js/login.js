@@ -1,57 +1,58 @@
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    const email = document.getElementById('email').value;
+    const password = document. getElementById('password').value;
     const messageDiv = document.getElementById('message');
-    const submitBtn = e.target.querySelector('button[type="submit"]');
 
-    const formData = {
-        email:  document.getElementById('email').value,
-        password: document.getElementById('password').value
-    };
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Connexion... ';
+    messageDiv.textContent = '';
+    messageDiv.className = 'message';
 
     try {
         const response = await fetch('http://localhost:8081/api/users/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON. stringify(formData)
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
         });
+
+        if (! response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || 'Erreur de connexion');
+        }
 
         const data = await response.json();
 
-        if (response.ok) {
-            messageDiv.className = 'message success';
-            messageDiv.textContent = '✅ Connexion réussie !  Redirection...';
-            messageDiv.style.display = 'block';
+        // ✅ Sauvegarder dans localStorage du User Service
+        localStorage.setItem('userId', data.id);
+        localStorage.setItem('username', data.username);
+        localStorage.setItem('email', data. email);
+        localStorage.setItem('countryCode', data.countryCode || '');
 
-            localStorage.setItem('token', data. token);
-            localStorage.setItem('userId', data.id);
-            localStorage.setItem('username', data.username);
+        messageDiv.textContent = `✅ Connexion réussie ! Bienvenue ${data.username}`;
+        messageDiv.className = 'message success';
 
-            setTimeout(() => {
-                window. location.href = 'dashboard.html';
-            }, 1500);
+        // ✅ Redirection avec les données dans l'URL
+        const params = new URLSearchParams({
+            userId: data.id,
+            username: data.username,
+            email: data.email,
+            countryCode: data. countryCode || ''
+        });
 
-        } else {
-            messageDiv.className = 'message error';
-            messageDiv.textContent = '❌ Email ou mot de passe incorrect';
-            messageDiv.style.display = 'block';
-
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Se connecter';
-        }
+        setTimeout(() => {
+            window.location.href = `http://localhost:8082/index.html?${params.toString()}`;
+        }, 1000);
 
     } catch (error) {
         console.error('Erreur:', error);
+        messageDiv.textContent = '❌ ' + error.message;
         messageDiv.className = 'message error';
-        messageDiv.textContent = '❌ Erreur de connexion au serveur';
-        messageDiv.style.display = 'block';
-
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Se connecter';
     }
 });
+
+console.log('✅ Login script loaded');
