@@ -1,0 +1,11 @@
+{
+  "java.jdt.ls.java.home": "/opt/homebrew/Cellar/openjdk@17/17.0.17/libexec/openjdk.jdk/Contents/Home",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-17",
+      "path": "/opt/homebrew/Cellar/openjdk@17/17.0.17/libexec/openjdk.jdk/Contents/Home",
+      "default": true
+    }
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
+}

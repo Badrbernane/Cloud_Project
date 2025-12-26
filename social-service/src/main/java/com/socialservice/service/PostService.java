@@ -1,8 +1,8 @@
 package com.socialservice.service;
 
 import com.socialservice.dto.CommentResponse;
-import com.socialservice.dto.CreateCommentRequest;
-import com.socialservice. dto.CreatePostRequest;
+import com.socialservice. dto.CreateCommentRequest;
+import com.socialservice.dto. CreatePostRequest;
 import com.socialservice.dto.PostResponse;
 import com.socialservice.model.Comment;
 import com.socialservice. model.Like;
@@ -15,12 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework. data.domain.Pageable;
-import org.springframework.stereotype. Service;
-import org.springframework. transaction.annotation.Transactional;
+import org.springframework.data. domain.Sort;
+import org. springframework.stereotype.Service;
+import org.springframework.transaction.annotation. Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream. Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class PostService {
 
     @Transactional
     public PostResponse createPost(CreatePostRequest request) {
-        log.info("Creating post for user: {}", request. getUserId());
+        log.info("Creating post for user:  {}", request.getUserId());
 
         Post post = Post.builder()
                 .userId(request.getUserId())
@@ -49,11 +50,23 @@ public class PostService {
         return mapToResponse(savedPost, null);
     }
 
+    // ✅ GET ALL POSTS
+    @Transactional(readOnly = true)
+    public List<PostResponse> getAllPosts(UUID currentUserId) {
+        log.info("📋 Getting all posts");
+
+        List<Post> posts = postRepository. findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        return posts.stream()
+                .map(post -> mapToResponse(post, currentUserId))
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public Page<PostResponse> getFeed(int page, int size, UUID currentUserId) {
         log.info("Fetching feed - page: {}, size: {}", page, size);
 
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest. of(page, size);
         Page<Post> posts = postRepository. findAllByOrderByCreatedAtDesc(pageable);
 
         return posts.map(post -> mapToResponse(post, currentUserId));
@@ -106,7 +119,7 @@ public class PostService {
 
         likeRepository.delete(like);
 
-        post.setLikesCount(Math.max(0, post.getLikesCount() - 1));
+        post.setLikesCount(Math.max(0, post. getLikesCount() - 1));
         postRepository.save(post);
 
         log.info("Post {} unliked successfully", postId);
@@ -115,7 +128,7 @@ public class PostService {
 
     @Transactional
     public CommentResponse addComment(UUID postId, CreateCommentRequest request) {
-        log.info("Adding comment to post {} by user {}", postId, request. getUserId());
+        log.info("Adding comment to post {} by user {}", postId, request.getUserId());
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
@@ -123,18 +136,19 @@ public class PostService {
         Comment comment = Comment.builder()
                 .post(post)
                 .userId(request.getUserId())
-                .content(request.getContent())
+                .content(request. getContent())
                 .build();
 
         Comment savedComment = commentRepository.save(comment);
 
-        post.setCommentsCount(post.getCommentsCount() + 1);
+        post.setCommentsCount(post. getCommentsCount() + 1);
         postRepository.save(post);
 
         log.info("Comment added successfully");
         return mapCommentToResponse(savedComment);
     }
 
+    // MAPPERS
     private PostResponse mapToResponse(Post post, UUID currentUserId) {
         boolean liked = currentUserId != null &&
                 likeRepository.existsByPostAndUserId(post, currentUserId);
@@ -155,10 +169,10 @@ public class PostService {
     private PostResponse mapToResponseWithComments(Post post, UUID currentUserId) {
         PostResponse response = mapToResponse(post, currentUserId);
 
-        List<CommentResponse> comments = commentRepository. findByPostOrderByCreatedAtDesc(post)
+        List<CommentResponse> comments = commentRepository.findByPostOrderByCreatedAtDesc(post)
                 .stream()
                 .map(this::mapCommentToResponse)
-                .collect(Collectors.toList());
+                .collect(Collectors. toList());
 
         response.setComments(comments);
         return response;
@@ -167,8 +181,8 @@ public class PostService {
     private CommentResponse mapCommentToResponse(Comment comment) {
         return CommentResponse.builder()
                 .id(comment.getId())
-                .userId(comment. getUserId())
-                .content(comment.getContent())
+                .userId(comment.getUserId())
+                .content(comment. getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
     }

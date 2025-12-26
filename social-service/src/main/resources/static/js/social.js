@@ -17,7 +17,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (! currentUserId) {
         showError('Vous devez être connecté pour accéder au feed social');
         setTimeout(() => {
-            window.location.href = 'http://localhost:8081/login. html';
+            window.location.href = 'http://localhost:8081/login.html';
         }, 2000);
         return;
     }
