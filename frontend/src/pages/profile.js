@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Navbar from '../components/navbar';
 import Sidebar from '../components/sidebar';
 
-export default function ProfilePage({ onLogout, onBack }) {
+export default function ProfilePage({ onLogout, onBack, onNavigate }) {
   const [profileData, setProfileData] = useState({
     username: '',
     email: '',
@@ -76,7 +76,7 @@ export default function ProfilePage({ onLogout, onBack }) {
         backgroundAttachment: 'fixed'
       }}
     >
-      <Sidebar onLogout={onLogout} />
+      <Sidebar onLogout={onLogout} onNavigate={onNavigate} />
       <div className="ml-20 p-4">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Mon Profil</h1>
