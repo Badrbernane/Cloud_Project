@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { sendWelcomeEmail } from '../services/emailService';
 
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081/api/users';
 
@@ -41,6 +42,11 @@ export function RegisterForm({ className, onLogin, ...props }) {
         localStorage.setItem('email', data.email || '');
         localStorage.setItem('countryCode', data.countryCode || countryCode);
         localStorage.setItem('createdAt', data.createdAt || new Date().toISOString());
+        const welcomeEmail = data.email || email;
+        const welcomeName = data.username || username;
+        sendWelcomeEmail(welcomeEmail, welcomeName)
+          .then((res) => console.debug('Welcome email result:', res))
+          .catch((e) => console.debug('Welcome email error:', e));
         setTimeout(() => onLogin?.(), 1500);
       } else {
         const message = data.message || "Email déjà utilisé ou données invalides";
