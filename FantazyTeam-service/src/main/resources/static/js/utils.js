@@ -145,6 +145,18 @@ function getPositionLabel(position) {
     return labels[position] || position;
 }
 
+// Met à jour le lien Marketplace avec les infos utilisateur
+function updateMarketplaceLink() {
+    const link = document.getElementById('marketplaceLink');
+    if (!link || !API_CONFIG?.MARKETPLACE) return;
+    const userId = localStorage.getItem('userId');
+    const username = localStorage.getItem('username');
+    const url = new URL(API_CONFIG.MARKETPLACE);
+    if (userId) url.searchParams.set('userId', userId);
+    if (username) url.searchParams.set('username', username);
+    link.href = url.toString();
+}
+
 // Fonction de déconnexion
 function logout() {
     localStorage.removeItem('userId');
@@ -168,6 +180,8 @@ window.addEventListener('DOMContentLoaded', () => {
             logout();
         });
     }
+
+    updateMarketplaceLink();
 });
 
 console.log('✅ Utils loaded');

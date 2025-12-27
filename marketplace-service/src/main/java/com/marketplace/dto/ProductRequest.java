@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -12,8 +13,7 @@ import java.math.BigDecimal;
 @Builder
 public class ProductRequest {
 
-    @NotNull
-    private Long sellerId;
+    private UUID sellerId;
 
     @NotBlank
     private String title;
@@ -32,4 +32,7 @@ public class ProductRequest {
 
     @NotBlank
     private String city;
+
+    @NotBlank
+    private String phoneNumber;
 }

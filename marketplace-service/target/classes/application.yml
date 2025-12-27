@@ -4,14 +4,9 @@ server:
 spring:
   application:
     name: marketplace-service
-
-  # Default: use in-memory H2 for local development so the app can start without RDS
-  datasource:
-    url: jdbc:h2:mem:marketplace;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
+  profiles:
+    # Default profile is local; override with -Dspring.profiles.active=rds for RDS
+    default: local
   jpa:
     hibernate:
       ddl-auto: update
@@ -20,8 +15,19 @@ spring:
       hibernate:
         format_sql: true
 
-  # You can activate the RDS config with: -Dspring.profiles.active=rds
-
 logging:
   level:
     com.marketplace: DEBUG
+
+services:
+  user: ${USER_SERVICE_URL:http://localhost:8081}
+  fantasy: ${FANTASY_SERVICE_URL:http://localhost:8082}
+  social: ${SOCIAL_SERVICE_URL:http://localhost:8083}
+  leaderboard: ${LEADERBOARD_SERVICE_URL:http://localhost:8084}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 2000
+        readTimeout: 4000

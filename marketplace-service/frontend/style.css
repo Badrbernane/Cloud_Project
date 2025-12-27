@@ -32,6 +32,45 @@ body {
     padding: 32px 20px 64px;
 }
 
+.top-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(15, 23, 36, 0.8);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.nav-brand {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.nav-links {
+    display: flex;
+    gap: 12px;
+}
+
+.nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: all 0.12s ease;
+}
+
+.nav-links a.active,
+.nav-links a:hover {
+    color: var(--text);
+    border-color: var(--border);
+    background: rgba(255, 255, 255, 0.03);
+}
+
 .hero {
     display: flex;
     align-items: flex-end;
@@ -64,6 +103,7 @@ h1, h2 {
 .actions {
     display: flex;
     gap: 8px;
+    align-items: center;
 }
 
 .panel {
@@ -223,6 +263,24 @@ button:active {
     border: 1px solid rgba(79, 156, 255, 0.3);
 }
 
+.user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px dashed var(--border);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+}
+
+.user-pill .muted {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
 .thumbs {
     display: flex;
     gap: 8px;
@@ -257,6 +315,10 @@ button:active {
     border: 1px dashed var(--border);
     border-radius: 10px;
     text-align: center;
+}
+
+.muted {
+    color: var(--muted);
 }
 
 @media (max-width: 640px) {

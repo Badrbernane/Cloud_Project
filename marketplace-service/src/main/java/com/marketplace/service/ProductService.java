@@ -1,5 +1,6 @@
 package com.marketplace.service;
 
+import com.marketplace.client.UserClient;
 import com.marketplace.dto.ProductRequest;
 import com.marketplace.dto.ProductResponse;
 import com.marketplace.dto.ProductUpdateRequest;
@@ -17,6 +18,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class ProductService {
@@ -24,12 +26,15 @@ public class ProductService {
     private static final String DEFAULT_CURRENCY = "MAD";
 
     private final ProductRepository productRepository;
+    private final UserClient userClient;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, UserClient userClient) {
         this.productRepository = productRepository;
+        this.userClient = userClient;
     }
 
     public ProductResponse create(ProductRequest req) {
+        ensureUserExists(req.getSellerId());
         Product saved = productRepository.save(toEntity(req));
         return toDto(saved);
     }
@@ -52,20 +57,22 @@ public class ProductService {
         return toDto(p);
     }
 
-    public List<ProductResponse> getBySeller(Long sellerId) {
+    public List<ProductResponse> getBySeller(UUID sellerId) {
         return productRepository.findBySellerId(sellerId).stream().map(this::toDto).collect(Collectors.toList());
     }
 
-    public ProductResponse update(Long id, Long sellerId, ProductUpdateRequest req) {
+    public ProductResponse update(Long id, UUID sellerId, ProductUpdateRequest req) {
         Product p = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         if (!Objects.equals(p.getSellerId(), sellerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only seller can modify the product");
         }
+        ensureUserExists(sellerId);
         p.setTitle(req.getTitle());
         p.setDescription(req.getDescription());
         p.setPrice(req.getPrice());
         p.setCity(req.getCity());
         p.setCategory(req.getCategory());
+        p.setPhoneNumber(req.getPhoneNumber());
         if (req.getCurrency() != null && !req.getCurrency().isBlank()) {
             p.setCurrency(resolveCurrency(req.getCurrency()));
         }
@@ -73,11 +80,12 @@ public class ProductService {
         return toDto(p);
     }
 
-    public void delete(Long id, Long sellerId) {
+    public void delete(Long id, UUID sellerId) {
         Product p = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
         if (!Objects.equals(p.getSellerId(), sellerId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only seller can delete the product");
         }
+        ensureUserExists(sellerId);
         productRepository.delete(p);
     }
 
@@ -90,6 +98,7 @@ public class ProductService {
                 .currency(resolveCurrency(req.getCurrency()))
                 .category(req.getCategory())
                 .city(req.getCity())
+                .phoneNumber(req.getPhoneNumber())
                 .status(ProductStatus.AVAILABLE)
                 .build();
     }
@@ -104,6 +113,7 @@ public class ProductService {
                 .description(p.getDescription())
                 .price(p.getPrice())
                 .currency(p.getCurrency())
+                .phoneNumber(p.getPhoneNumber())
                 .category(p.getCategory())
                 .city(p.getCity())
                 .status(p.getStatus())
@@ -138,6 +148,16 @@ public class ProductService {
             return Category.valueOf(value.toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid category: " + value);
+        }
+    }
+
+    private void ensureUserExists(UUID userId) {
+        try {
+            userClient.getUser(userId.toString());
+        } catch (feign.FeignException.NotFound e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found: " + userId);
+        } catch (feign.FeignException e) {
+            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, "User service unavailable");
         }
     }
 }

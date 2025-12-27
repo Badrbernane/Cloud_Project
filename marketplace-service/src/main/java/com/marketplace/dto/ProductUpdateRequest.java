@@ -33,4 +33,7 @@ public class ProductUpdateRequest {
 
     @NotBlank
     private String city;
+
+    @NotBlank
+    private String phoneNumber;
 }

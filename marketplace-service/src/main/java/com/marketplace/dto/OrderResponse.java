@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -12,8 +13,8 @@ import java.time.LocalDateTime;
 public class OrderResponse {
     private Long id;
     private Long productId;
-    private Long buyerId;
-    private Long sellerId;
+    private UUID buyerId;
+    private UUID sellerId;
     private BigDecimal amount;
     private String currency;
     private String status;

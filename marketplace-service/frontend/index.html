@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<nav class="top-nav">
+    <div class="nav-brand">Cloud Project</div>
+    <div class="nav-links">
+        <a href="/" class="active">Marketplace</a>
+    </div>
+</nav>
 <main class="page">
     <header class="hero">
         <div>
@@ -15,6 +21,10 @@
             <p class="subtitle">Créer un produit et vérifier la liste via l'API Spring Boot (port 8085).</p>
         </div>
         <div class="actions">
+            <div class="user-pill" title="Utilisateur courant (session front)">
+                <span class="muted">Utilisateur :</span>
+                <strong id="username-display">Non connecté</strong>
+            </div>
             <button id="load-products" class="secondary">Charger les produits</button>
         </div>
     </header>
@@ -30,7 +40,11 @@
         <form id="product-form" class="grid">
             <label>
                 <span>Seller ID</span>
-                <input type="number" name="sellerId" min="1" required>
+                <input type="text" name="sellerId" placeholder="Auto (via ?sellerId=UUID ou localStorage)" readonly>
+            </label>
+            <label>
+                <span>Téléphone</span>
+                <input type="text" name="phoneNumber" required placeholder="+2126...">
             </label>
             <label>
                 <span>Titre</span>
@@ -77,6 +91,18 @@
             <button id="refresh-products" class="secondary">Actualiser</button>
         </div>
         <div id="products" class="cards"></div>
+    </section>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <p class="eyebrow">Mes produits</p>
+                <h2>Pour le vendeur courant</h2>
+            </div>
+            <button id="refresh-my-products" class="secondary">Actualiser</button>
+        </div>
+        <div id="my-products" class="cards"></div>
+        <div id="my-products-message" class="muted"></div>
     </section>
 </main>
 

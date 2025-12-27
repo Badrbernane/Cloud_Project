@@ -3,6 +3,8 @@ package com.marketplace.dto;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -12,5 +14,5 @@ public class OrderRequest {
     private Long productId;
 
     @NotNull
-    private Long buyerId;
+    private UUID buyerId;
 }
