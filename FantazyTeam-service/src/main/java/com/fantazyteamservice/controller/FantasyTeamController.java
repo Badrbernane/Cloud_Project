@@ -40,6 +40,16 @@ public class FantasyTeamController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // java
+// Insert inside the existing controller class (adjust imports if needed)
+    @PutMapping("/players/{playerId}/stats")
+    public ResponseEntity<PlayerResponse> updatePlayerStats(
+            @PathVariable UUID playerId,
+            @RequestBody UpdatePlayerStatsRequest request) {
+        PlayerResponse updated = fantasyTeamService.updatePlayerStats(playerId, request);
+        return ResponseEntity.ok(updated);
+    }
+
     @GetMapping("/teams/user/{userId}")
     public ResponseEntity<List<TeamResponse>> getUserTeams(@PathVariable UUID userId) {
         log.info("GET /teams/user/{}", userId);

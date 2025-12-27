@@ -310,24 +310,23 @@ function setupFilters() {
     }
 }
 
-// Appliquer les filtres
+// javascript
+// File: `FantazyTeam-service/src/main/resources/static/js/players.js`
 function applyFilters() {
     const position = document.getElementById('positionFilter').value;
-    const search = document.getElementById('searchPlayer').value. toLowerCase();
+    const search = document.getElementById('searchPlayer').value.toLowerCase();
 
     let filtered = allPlayers;
 
-    // Filtrer par position
     if (position) {
         filtered = filtered.filter(p => p.position === position);
     }
 
-    // Filtrer par recherche
     if (search) {
         filtered = filtered.filter(p =>
             p.name.toLowerCase().includes(search) ||
             p.club.toLowerCase().includes(search) ||
-            (p.nationality && p.nationality. toLowerCase().includes(search))
+            (p.nationality && p.nationality.toLowerCase().includes(search))
         );
     }
 

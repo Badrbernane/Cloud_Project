@@ -149,6 +149,31 @@ public class FantasyTeamService {
         return mapToTeamResponse(team);
     }
 
+
+    // java
+// Insert into the existing FantasyTeamService class
+    @Transactional
+    public PlayerResponse updatePlayerStats(UUID playerId, UpdatePlayerStatsRequest request) {
+        log.info("🔄 Updating stats for player {}", playerId);
+
+        Player player = playerRepository.findById(playerId)
+                .orElseThrow(() -> new RuntimeException("Player not found"));
+
+        player.setTotalPoints(request.getTotalPoints());
+        player.setGoals(request.getGoals());
+        player.setAssists(request.getAssists());
+        player.setCleanSheets(request.getCleanSheets());
+
+        player = playerRepository.save(player);
+        log.info("✅ Player {} stats updated: points={} goals={} assists={} cleanSheets={}",
+                player.getName(),
+                player.getTotalPoints(),
+                player.getGoals(),
+                player.getAssists(),
+                player.getCleanSheets());
+
+        return mapToPlayerResponse(player);
+    }
     @Transactional
     public PlayerResponse createPlayer(CreatePlayerRequest request) {
         log.info("🟢 Creating player: {}", request.getName());
