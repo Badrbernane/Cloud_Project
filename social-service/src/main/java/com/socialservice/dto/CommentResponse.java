@@ -16,6 +16,7 @@ public class CommentResponse {
 
     private UUID id;
     private UUID userId;
+    private String username;  // ⬅️ AJOUTEZ CE CHAMP
     private String content;
     private LocalDateTime createdAt;
 }

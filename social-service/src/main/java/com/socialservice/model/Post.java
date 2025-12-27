@@ -28,6 +28,9 @@ public class Post {
     @Column(nullable = false)
     private UUID userId;  // Référence vers User Service
 
+    @Column(name = "username")  // ← AJOUTE CE CHAMP
+    private String username;
+
     @Column(nullable = false, length = 2000)
     private String content;
 

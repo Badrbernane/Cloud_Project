@@ -34,10 +34,11 @@ public class PostService {
 
     @Transactional
     public PostResponse createPost(CreatePostRequest request) {
-        log.info("Creating post for user:  {}", request.getUserId());
+        log.info("Creating post for user:   {}", request.getUserId());
 
         Post post = Post.builder()
                 .userId(request.getUserId())
+                .username(request.getUsername())  // ← AJOUTE LE USERNAME
                 .content(request.getContent())
                 .imageUrl(request.getImageUrl())
                 .likesCount(0)
@@ -148,20 +149,27 @@ public class PostService {
         return mapCommentToResponse(savedComment);
     }
 
-    // MAPPERS
     private PostResponse mapToResponse(Post post, UUID currentUserId) {
         boolean liked = currentUserId != null &&
                 likeRepository.existsByPostAndUserId(post, currentUserId);
 
+        // Récupérer tous les userId qui ont liké
+        List<String> userLikes = likeRepository.findByPost(post)
+                .stream()
+                .map(like -> like.getUserId().toString())
+                .collect(Collectors.toList());
+
         return PostResponse.builder()
                 .id(post.getId())
                 .userId(post.getUserId())
+                .username(post.getUsername())  // ← AJOUTE LE USERNAME
                 .content(post.getContent())
                 .imageUrl(post.getImageUrl())
                 .likesCount(post.getLikesCount())
                 .commentsCount(post.getCommentsCount())
+                .userLikes(userLikes)  // ← AJOUTE LA LISTE DES LIKES
                 .createdAt(post.getCreatedAt())
-                .updatedAt(post. getUpdatedAt())
+                .updatedAt(post.getUpdatedAt())
                 .likedByCurrentUser(liked)
                 .build();
     }

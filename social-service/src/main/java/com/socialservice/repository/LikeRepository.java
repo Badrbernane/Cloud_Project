@@ -5,6 +5,7 @@ import com.socialservice.model.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype. Repository;
 
+import java.util.List;
 import java.util. Optional;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
     boolean existsByPostAndUserId(Post post, UUID userId);
 
     long countByPost(Post post);
+
+    List<Like> findByPost(Post post);
 }

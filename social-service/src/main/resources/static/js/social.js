@@ -10,7 +10,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loadUserFromURL();
 
     currentUserId = localStorage.getItem('userId');
-    currentUsername = localStorage. getItem('username') || 'Utilisateur';
+    currentUsername = localStorage.getItem('username') || 'Utilisateur';
 
     console.log('👤 Current user:', currentUsername, currentUserId);
 
@@ -45,7 +45,7 @@ function loadUserFromURL() {
         localStorage.setItem('userId', userId);
     }
     if (username) {
-        localStorage. setItem('username', username);
+        localStorage.setItem('username', username);
     }
 
     // Nettoyer l'URL
@@ -85,12 +85,13 @@ async function createPost() {
     try {
         const data = {
             userId: currentUserId,
+            username: currentUsername,  // ← AJOUTÉ
             content: content
         };
 
         console.log('📤 Creating post:', data);
 
-        const response = await fetch(`${API_CONFIG.SOCIAL_SERVICE}${ENDPOINTS.POSTS}`, {
+        const response = await fetch(`${API_CONFIG.SOCIAL_SERVICE}${ENDPOINTS. POSTS}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -109,7 +110,7 @@ async function createPost() {
         document.getElementById('postContent').value = '';
         document.getElementById('charCount').textContent = '0';
 
-        showSuccess('✅ Post publié avec succès ! ');
+        showSuccess('✅ Post publié avec succès !   ');
 
         // Recharger le feed
         await loadPosts();
@@ -126,7 +127,7 @@ async function loadPosts() {
     setLoading(true);
 
     try {
-        const response = await fetch(`${API_CONFIG.SOCIAL_SERVICE}${ENDPOINTS.POSTS}`);
+        const response = await fetch(`${API_CONFIG.SOCIAL_SERVICE}${ENDPOINTS. POSTS}`);
 
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -134,6 +135,11 @@ async function loadPosts() {
 
         allPosts = await response.json();
         console.log('✅ Posts loaded:', allPosts.length);
+
+        // Log du premier post pour debug
+        if (allPosts. length > 0) {
+            console.log('📋 Premier post:', allPosts[0]);
+        }
 
         displayPosts(allPosts);
 
@@ -167,7 +173,9 @@ function displayPosts(posts) {
 
 // Créer le HTML d'un post
 function createPostHTML(post) {
-    const isLiked = post.userLikes && post.userLikes.includes(currentUserId);
+    // ✅ CORRECTION:  Convertir currentUserId en string pour la comparaison
+    const userIdString = currentUserId ? currentUserId. toString() : '';
+    const isLiked = post.userLikes && post.userLikes.includes(userIdString);
     const showComments = post.showComments || false;
 
     const initials = (post.username || 'U').substring(0, 2).toUpperCase();
@@ -186,14 +194,14 @@ function createPostHTML(post) {
             <div class="post-content">${escapeHtml(post.content)}</div>
             
             <div class="post-actions">
-                <button class="action-btn like-btn ${isLiked ? 'liked' :  ''}" 
+                <button class="action-btn like-btn ${isLiked ? 'liked' : ''}" 
                         onclick="toggleLike('${post.id}', ${isLiked})">
-                    ${isLiked ? '❤️' : '🤍'} ${post.likeCount || 0}
+                    ${isLiked ? '❤️' : '🤍'} ${post.likesCount || 0}
                 </button>
                 
                 <button class="action-btn comment-btn ${showComments ? 'active' : ''}" 
                         onclick="toggleComments('${post.id}')">
-                    💬 ${post.commentCount || 0}
+                    💬 ${post.commentsCount || 0}
                 </button>
             </div>
             
@@ -211,7 +219,7 @@ function createPostHTML(post) {
                 
                 <div class="comments-list" id="comments-list-${post.id}">
                     ${post.comments && post.comments.length > 0 ?
-        post. comments.map(comment => createCommentHTML(comment)).join('') :
+        post.comments.map(comment => createCommentHTML(comment)).join('') :
         '<p class="empty-message" style="padding: 20px;">Aucun commentaire</p>'
     }
                 </div>
@@ -241,24 +249,23 @@ function createCommentHTML(comment) {
 
 // Toggle like
 async function toggleLike(postId, isCurrentlyLiked) {
-    console.log(`${isCurrentlyLiked ? '💔' : '❤️'} Toggle like for post: `, postId);
+    console.log((isCurrentlyLiked ? '💔' : '❤️') + ' Toggle like for post:', postId);
+
+    const endpoint = isCurrentlyLiked ?
+        ENDPOINTS.UNLIKE_POST(postId) :
+        ENDPOINTS.LIKE_POST(postId);
 
     try {
-        const endpoint = isCurrentlyLiked ?
-            ENDPOINTS.UNLIKE_POST(postId) :
-            ENDPOINTS.LIKE_POST(postId);
+        const response = await fetch(
+            `${API_CONFIG.SOCIAL_SERVICE}${endpoint}?userId=${currentUserId}`,
+            { method: 'POST' }
+        );
 
-        const response = await fetch(`${API_CONFIG.SOCIAL_SERVICE}${endpoint}? userId=${currentUserId}`, {
-            method: 'POST'
-        });
-
-        if (!response.ok) {
+        if (!response. ok) {
             throw new Error(`HTTP ${response.status}`);
         }
 
         console.log('✅ Like toggled');
-
-        // Recharger les posts
         await loadPosts();
 
     } catch (error) {
@@ -267,24 +274,51 @@ async function toggleLike(postId, isCurrentlyLiked) {
     }
 }
 
-// Toggle affichage commentaires
-function toggleComments(postId) {
+// Toggle affichage commentaires ET charger les détails
+async function toggleComments(postId) {
     const commentsSection = document.getElementById(`comments-${postId}`);
     const isVisible = commentsSection.style.display === 'block';
 
-    commentsSection.style.display = isVisible ? 'none' : 'block';
+    if (isVisible) {
+        // Fermer les commentaires
+        commentsSection.style.display = 'none';
+        const post = allPosts.find(p => p.id === postId);
+        if (post) {
+            post.showComments = false;
+        }
+    } else {
+        // Ouvrir et CHARGER les commentaires depuis l'API
+        console.log('🔍 Loading comments for post:', postId);
 
-    // Mettre à jour l'état dans allPosts
-    const post = allPosts.find(p => p.id === postId);
-    if (post) {
-        post.showComments = ! isVisible;
-    }
+        try {
+            const response = await fetch(
+                `${API_CONFIG.SOCIAL_SERVICE}/api/posts/${postId}?currentUserId=${currentUserId}`
+            );
 
-    // Focus sur input si on affiche
-    if (! isVisible) {
-        setTimeout(() => {
-            document.getElementById(`comment-input-${postId}`).focus();
-        }, 100);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const postWithComments = await response.json();
+            console.log('✅ Comments loaded:', postWithComments.comments);
+
+            // Mettre à jour le post dans allPosts avec les commentaires
+            const postIndex = allPosts.findIndex(p => p.id === postId);
+            if (postIndex !== -1) {
+                allPosts[postIndex].comments = postWithComments.comments;
+                allPosts[postIndex].showComments = true;
+            }
+
+            // Réafficher ce post spécifique avec les commentaires
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postCard) {
+                postCard.outerHTML = createPostHTML(allPosts[postIndex]);
+            }
+
+        } catch (error) {
+            console.error('❌ Error loading comments:', error);
+            showError('Erreur lors du chargement des commentaires');
+        }
     }
 }
 
@@ -301,13 +335,14 @@ async function addComment(postId) {
     try {
         const data = {
             userId: currentUserId,
+            username: currentUsername,  // ← AJOUTÉ
             content: content
         };
 
         console.log('📤 Adding comment to post:', postId, data);
 
         const response = await fetch(
-            `${API_CONFIG.SOCIAL_SERVICE}${ENDPOINTS. ADD_COMMENT(postId)}`,
+            `${API_CONFIG.SOCIAL_SERVICE}${ENDPOINTS.ADD_COMMENT(postId)}`,
             {
                 method:  'POST',
                 headers:  {
@@ -317,7 +352,7 @@ async function addComment(postId) {
             }
         );
 
-        if (! response.ok) {
+        if (!response. ok) {
             throw new Error(`HTTP ${response.status}`);
         }
 
@@ -384,7 +419,7 @@ function showSuccess(message) {
     if (messageEl) {
         messageEl.className = 'message success';
         messageEl.textContent = message;
-        messageEl.style.display = 'block';
+        messageEl. style.display = 'block';
 
         setTimeout(() => {
             messageEl. style.display = 'none';
@@ -401,7 +436,7 @@ function showError(message) {
         messageEl.style.display = 'block';
 
         setTimeout(() => {
-            messageEl.style.display = 'none';
+            messageEl. style.display = 'none';
         }, 5000);
     }
 }
@@ -412,12 +447,12 @@ function setupLogout() {
         e.preventDefault();
 
         localStorage.removeItem('userId');
-        localStorage.removeItem('username');
+        localStorage. removeItem('username');
         localStorage.removeItem('email');
         localStorage.removeItem('countryCode');
 
         alert('Vous êtes déconnecté');
-        window.location.href = 'http://localhost:8081/login.html';
+        window.location. href = 'http://localhost:8081/login.html';
     });
 }
 
