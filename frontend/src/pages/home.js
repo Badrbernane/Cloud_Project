@@ -10,6 +10,8 @@ import PlayersPage from "./players"
 import MyTeamPage from "./my-team"
 import LeaderboardPage from "./leaderboard"
 import { getAllPosts } from '../services/socialService'
+import MarketplacePage from "./marketplace"
+import CreateProductPage from "./create-product"
 
 export default function Home({ onLogout }) {
   const [view, setView] = useState('feed');
@@ -60,6 +62,10 @@ export default function Home({ onLogout }) {
       setView('myteam');
     } else if (destination === 'leaderboard') {
       setView('leaderboard');
+    } else if (destination === 'shop') {
+      setView('shop');
+    } else if (destination === 'createProduct') {
+      setView('createProduct');
     } else {
       setView('feed');
     }
@@ -84,7 +90,14 @@ export default function Home({ onLogout }) {
   if (view === 'leaderboard') {
     return <LeaderboardPage onLogout={onLogout} onBack={() => setView('fantazy')} onNavigate={handleNavigate} />;
   }
-
+  if (view === 'shop') {
+    return <MarketplacePage onLogout={onLogout} onBack={() => setView('feed')} onNavigate={handleNavigate} />;
+  }
+  
+  if (view === 'createProduct') {
+    return <CreateProductPage onLogout={onLogout} onBack={() => setView('shop')} onNavigate={handleNavigate} />;
+  }
+  
   return (
     <div 
       className="min-h-screen text-white"
