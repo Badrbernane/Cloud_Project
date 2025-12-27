@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
@@ -21,7 +22,8 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long sellerId;
+    @Column(nullable = false)
+    private UUID sellerId;
 
     private String title;
 
@@ -37,6 +39,9 @@ public class Product {
     private Category category;
 
     private String city;
+
+    @Column(length = 50)
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Builder.Default

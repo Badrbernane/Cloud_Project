@@ -54,6 +54,19 @@ public class UserController {
         return ResponseEntity.ok("User Service is UP and running!  ✅");
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> me(
+            @RequestHeader(name = "X-User-Id", required = false) UUID userIdHeader,
+            @RequestParam(name = "userId", required = false) UUID userIdParam) {
+        UUID userId = userIdHeader != null ? userIdHeader : userIdParam;
+        if (userId == null) {
+            log.warn("GET /users/me called without user identifier");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        UserResponse response = userService.getUserById(userId);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUsers() {
         log.info("📋 Getting all users");

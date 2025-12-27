@@ -8,11 +8,14 @@ import com.marketplace.service.ImageService;
 import com.marketplace.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/market/products")
@@ -27,7 +30,15 @@ public class ProductController {
     }
 
     @PostMapping
-    public ProductResponse create(@Valid @RequestBody ProductRequest req) {
+    public ProductResponse create(@RequestHeader(value = "X-User-Id", required = false) UUID userIdHeader,
+                                  @Valid @RequestBody ProductRequest req) {
+        if (req.getSellerId() == null) {
+            if (userIdHeader != null) {
+                req.setSellerId(userIdHeader);
+            } else {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sellerId is required (body or X-User-Id header)");
+            }
+        }
         return productService.create(req);
     }
 
@@ -45,22 +56,22 @@ public class ProductController {
     }
 
     @GetMapping("/seller/{sellerId}")
-    public List<ProductResponse> bySeller(@PathVariable Long sellerId) {
+    public List<ProductResponse> bySeller(@PathVariable UUID sellerId) {
         return productService.getBySeller(sellerId);
     }
 
     @PutMapping("/{id}")
-    public ProductResponse update(@PathVariable Long id, @RequestParam Long sellerId, @Valid @RequestBody ProductUpdateRequest req) {
+    public ProductResponse update(@PathVariable Long id, @RequestParam UUID sellerId, @Valid @RequestBody ProductUpdateRequest req) {
         return productService.update(id, sellerId, req);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id, @RequestParam Long sellerId) {
+    public void delete(@PathVariable Long id, @RequestParam UUID sellerId) {
         productService.delete(id, sellerId);
     }
 
     @PostMapping(value = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ProductImageResponse uploadImage(@PathVariable Long id, @RequestParam Long sellerId, @RequestPart("file") MultipartFile file) {
+    public ProductImageResponse uploadImage(@PathVariable Long id, @RequestParam UUID sellerId, @RequestPart("file") MultipartFile file) {
         return imageService.uploadProductImage(id, sellerId, file);
     }
 

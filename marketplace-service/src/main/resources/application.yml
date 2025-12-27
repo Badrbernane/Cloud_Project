@@ -18,3 +18,16 @@ spring:
 logging:
   level:
     com.marketplace: DEBUG
+
+services:
+  user: ${USER_SERVICE_URL:http://localhost:8081}
+  fantasy: ${FANTASY_SERVICE_URL:http://localhost:8082}
+  social: ${SOCIAL_SERVICE_URL:http://localhost:8083}
+  leaderboard: ${LEADERBOARD_SERVICE_URL:http://localhost:8084}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 2000
+        readTimeout: 4000

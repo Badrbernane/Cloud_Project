@@ -32,7 +32,7 @@ public class ImageService {
         this.productImageRepository = productImageRepository;
     }
 
-    public ProductImageResponse uploadProductImage(Long productId, Long sellerId, MultipartFile file) {
+    public ProductImageResponse uploadProductImage(Long productId, UUID sellerId, MultipartFile file) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 

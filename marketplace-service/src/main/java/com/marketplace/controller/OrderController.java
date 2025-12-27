@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/market/orders")
@@ -24,12 +25,12 @@ public class OrderController {
     }
 
     @GetMapping("/buyer/{buyerId}")
-    public List<OrderResponse> byBuyer(@PathVariable Long buyerId) {
+    public List<OrderResponse> byBuyer(@PathVariable UUID buyerId) {
         return orderService.getByBuyer(buyerId);
     }
 
     @GetMapping("/seller/{sellerId}")
-    public List<OrderResponse> bySeller(@PathVariable Long sellerId) {
+    public List<OrderResponse> bySeller(@PathVariable UUID sellerId) {
         return orderService.getBySeller(sellerId);
     }
 }

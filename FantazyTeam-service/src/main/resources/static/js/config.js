@@ -2,7 +2,8 @@
 const API_CONFIG = {
     FANTASY_SERVICE: 'http://localhost:8082',
     USER_SERVICE: 'http://localhost:8081',
-    LEADERBOARD_SERVICE: 'http://localhost:8084'
+    LEADERBOARD_SERVICE: 'http://localhost:8084',
+    MARKETPLACE: 'http://localhost:8085/index.html'
 };
 
 // Endpoints

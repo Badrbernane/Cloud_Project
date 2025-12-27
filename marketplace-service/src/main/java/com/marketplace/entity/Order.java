@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "orders")
@@ -21,9 +22,11 @@ public class Order {
 
     private Long productId;
 
-    private Long buyerId;
+    @Column(nullable = false)
+    private UUID buyerId;
 
-    private Long sellerId;
+    @Column(nullable = false)
+    private UUID sellerId;
 
     private BigDecimal amount;
 

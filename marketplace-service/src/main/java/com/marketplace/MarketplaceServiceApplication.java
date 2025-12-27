@@ -7,9 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @Slf4j
 @SpringBootApplication
+@EnableFeignClients
 public class MarketplaceServiceApplication {
 
     public static void main(String[] args) {

@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${RDS_HOST:localhost}:${RDS_PORT:5432}/${RDS_DB:marketplace}
+    url: jdbc:postgresql://marketplacedb.ctgsyoo0woip.eu-north-1.rds.amazonaws.com:5432/marketplaceDB
     driver-class-name: org.postgresql.Driver
-    username: ${RDS_USERNAME:postgres}
-    password: ${RDS_PASSWORD:password}
+    username: postgres
+    password: Mouslim1234
   jpa:
     hibernate:
       ddl-auto: update

@@ -159,10 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="meta">Téléphone: ${p.phoneNumber ?? "-"}</p>
                     <p class="meta">Vendeur: ${p.sellerId ?? "-"}</p>
                     <div class="thumbs">${images || "<span class='meta'>Aucune image</span>"}</div>
-                    <div class="upload-row" data-product-id="${p.id}" data-seller-id="${p.sellerId}">
-                        <input type="file" accept="image/*" class="file-input">
-                        <button type="button" class="secondary upload-btn">Uploader une image</button>
-                    </div>
                 </article>
             `;
         });
@@ -198,6 +194,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="meta">Téléphone: ${p.phoneNumber ?? "-"}</p>
                     <p class="meta">Vendeur: ${p.sellerId ?? "-"}</p>
                     <div class="thumbs">${images || "<span class='meta'>Aucune image</span>"}</div>
+                    <div class="upload-row" data-product-id="${p.id}" data-seller-id="${p.sellerId}">
+                        <input type="file" accept="image/*" class="file-input">
+                        <button type="button" class="secondary upload-btn">Uploader une image</button>
+                    </div>
                 </article>
             `;
         });
